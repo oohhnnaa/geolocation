@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""
+    />
+
+    <script
+      src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin=""
+    ></script>
+
+    <style>
+      body {
+        margin: 0;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 1rem;
+      }
+      #map {
+        width: 80%;
+        height: 70vh;
+        margin: 0 auto;
+      }
+    </style>
+    <title>Geolocation</title>
+  </head>
+
+  <body>
+    <h1>WHERE AM I</h1>
+    <p>
+      latidute: <span id="lat"></span><br />
+      longitude: <span id="lon"></span><br />
+      altitude: <span id="alt"></span><br />
+    </p>
+    <div id="map"></div>
+
+    <script>
+      const mymap = L.map("map").setView([0, 0], 1);
+      const marker = L.marker([0, 0]).addTo(mymap);
+
+      L.tileLayer(
+        "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoib29oaG5uYWEiLCJhIjoiY2tsdHNrYnlsMHpmZDJ4bXB3NzR1cHpmMSJ9.1f0JRyMty87k8hAPYOC7Tw",
+        {
+          attribution:
+            'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+          maxZoom: 18,
+          id: "mapbox/streets-v11",
+          tileSize: 512,
+          zoomOffset: -1,
+          accessToken: "your.mapbox.access.token",
+        }
+      ).addTo(mymap);
+
+      let firstTime = true;
+
+      function getPosition() {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          // let lat = pos.coords.latitude;
+          // let lon = pos.coords.longitude;
+          // let alt = pos.coords.altitude;
+          const { latitude: lat, longitude: lon } = pos.coords;
+          marker.setLatLng([lat, lon]);
+          if (firstTime) {
+            mymap.setView([lat, lon], 10);
+            firstTime = false;
+          }
+
+          document.getElementById("lat").textContent = lat.toFixed(2) + "\xB0";
+          document.getElementById("lon").textContent = lon.toFixed(2) + "\xB0";
+          document.getElementById("alt").textContent =
+            alt.toFixed(2) + " m above sea level";
+          // let date = new Date(pos.timestamp);
+          // document.body.innerHTML += `<p>Timestamp: ${date.toLocaleTimeString()}</>`;
+        });
+      }
+
+      getPosition();
+      setInterval(getPosition, 1000);
+    </script>
+  </body>
+</html>
